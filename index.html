@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Week 6 Task 4A — AI Note Quality Reviewer</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #5b6472;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --border: #d9e2f2;
+      --soft: #eaf1ff;
+      --success: #0f766e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    }
+    .header-inner {
+      max-width: 920px;
+      margin: 0 auto;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    h1 {
+      font-size: 1.15rem;
+      margin: 0;
+      line-height: 1.3;
+    }
+    button {
+      appearance: none;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      font-size: 0.98rem;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    }
+    button:hover { background: var(--accent-dark); }
+    button:active { transform: translateY(1px); }
+    main {
+      max-width: 920px;
+      margin: 20px auto 48px;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    }
+    .instruction {
+      background: var(--soft);
+      border-color: #bfd4ff;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.08rem;
+    }
+    ol, ul { padding-left: 1.25rem; }
+    .note {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+    .status {
+      display: none;
+      color: var(--success);
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background: #fbfdff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 0.98rem;
+      line-height: 1.65;
+      margin: 0;
+    }
+    .small-label {
+      display: inline-block;
+      background: #eef2ff;
+      color: #3730a3;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.82rem;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 520px) {
+      h1 { font-size: 1rem; }
+      button { width: 100%; }
+      .card { padding: 16px; border-radius: 14px; }
+      pre { font-size: 0.93rem; padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>Week 6 Task 4A — AI Note Quality Reviewer</h1>
+      <div>
+        <button onclick="copyPrompt()">Copy full prompt</button>
+        <span id="copyStatus" class="status">Copied!</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card instruction">
+      <span class="small-label">Student instructions</span>
+      <h2>How to use this page</h2>
+      <ol>
+        <li>Only use this after you have finished listening and taking notes for Task 4A.</li>
+        <li>Take a clear photo or screenshot of your handwritten notes.</li>
+        <li>Open any AI tool you are allowed to use, such as XIPU AI.</li>
+        <li>Upload the photo or screenshot of your notes.</li>
+        <li>Tap <strong>Copy full prompt</strong> on this page and paste it into the AI tool.</li>
+        <li>Read the feedback and improve your own notes. Do not simply copy the AI answer.</li>
+      </ol>
+      <p class="note">Tip: If the AI cannot read your handwriting clearly, type 3–5 key words from your notes into the chat box.</p>
+    </section>
+
+    <section class="card">
+      <span class="small-label">Prompt to copy</span>
+      <pre id="promptText">Please review my listening notes in the image.
+
+I am a Year 1 EAP student. I listened to a lecture about how to make the waste management process more sustainable and took notes by hand. Please compare my notes with the full transcript below.
+
+Your job is NOT to rewrite my notes. Your job is to help me improve the quality of my listening notes.
+
+Please check:
+
+1. Did I include the main stages in the sustainable waste management process?
+
+2. Did I put the stages in the correct order?
+
+3. Did I include important examples and details for each stage?
+
+4. Did I notice useful process linking words and phrases?
+
+5. Did I use effective shorthand methods, such as abbreviations, symbols, arrows, and short noun/verb phrases?
+
+6. Are my notes too short, too long, unclear, or missing important information?
+
+When commenting on shorthand methods, please check whether my notes:
+
+- use abbreviations where useful, such as “info”, “gov”, “dept”, “ppl”, “b/c”, “e.g.”;
+
+- use symbols where useful, such as “&”, “+”, “→”, “↑”, “↓”, “=”, “≠”, “x” or “✕”;
+
+- avoid writing full sentences when key words or short phrases are enough;
+
+- keep the meaning clear even when using shortened forms.
+
+Give me feedback in this format:
+
+Main stages and order:
+
+Good point:
+
+Suggestion:
+
+Examples/details:
+
+Good point:
+
+Suggestion:
+
+Process linking words:
+
+Good point:
+
+Suggestion:
+
+Shorthand methods:
+
+Good point:
+
+Suggestion:
+
+Three improvements I should make to my notes:
+1.
+2.
+3.
+
+Use simple English. Do not give me a full model answer. Focus on helping me improve my own notes.
+
+Full transcript:
+
+Good day, everyone! Today, we will discuss a more sustainable waste management process, which is crucial for protecting our environment. By managing waste sustainably, we can reduce the amount of waste we produce and help create a cleaner planet. In this lecture, I’ll explain the five main stages of this process: purchasing, usage, at-home storage, collection, and recycling.
+
+To begin with, the first step is purchasing. In this stage, we should think carefully about what we buy. One way to make this part more sustainable is to choose products with little or no packaging. For instance, instead of buying fruit that is wrapped in plastic, we can buy loose fruit. This simple change can significantly reduce the amount of plastic waste we create. Furthermore, buying items in bulk, which means in large quantities, is another great option. When we purchase in bulk, we often use less packaging overall. We can also select products made from recycled materials. This supports companies that prioritize sustainability and encourages them to produce more eco-friendly items. By making better choices while shopping, we can start reducing waste right from the start.
+
+Moving on, the second stage is usage. This part is about how we utilize the things we buy. To make this phase more sustainable, we should try to use items for a longer time. For example, instead of throwing away broken products, we can try to repair them. Many things, such as clothes or electronics, can be fixed rather than replaced. Additionally, we can think about sharing or borrowing items that we don’t use frequently. For instance, instead of buying a tool that we will only use once, we can borrow it from a friend or neighbour. This not only reduces waste, but also saves us money. By using products for a longer time, we can help decrease the amount of waste we generate.
+
+Next, the third step is at-home storage. In this stage, we need to think about how we store our waste at home. To make this part more sustainable, we should separate our waste into different categories. For example, we can have separate bins for recycling, organic waste, and general trash. This makes it easier to recycle later. It is also important to teach everyone in the household about proper waste sorting. When everyone understands how to sort waste correctly, we can reduce contamination in recycling bins. By organizing our waste storage effectively, we can improve our recycling efforts and reduce overall waste.
+
+Following that, the fourth phase is collection. This stage involves collecting waste from our homes. To make this process more sustainable, we can use waste management services that prioritize recycling. Many cities offer special collection days for recycling or organic waste. Participating in these programs helps ensure that our waste is handled properly. We can also encourage our neighbours to join in, creating a community effort to reduce waste. Another way to improve this part is to reduce the frequency of waste collection for general trash. By doing this, we can motivate people to produce less waste.
+
+Finally, the last stage is recycling. In this part, a smaller process makes waste reusable. First, waste is sorted further at recycling facilities. This means separating materials like paper, glass, and plastics. Next, the sorted materials are cleaned to remove any contaminants, such as food. After cleaning, the materials are processed into new products. For example, recycled paper can be used for new paper products such as packaging or toilet paper, while plastics can be made into new containers. This means that this waste doesn’t go into landfills, but is used again. By improving our recycling efforts, we can significantly reduce the amount of waste that ends up in landfills.
+
+In conclusion, sustainable waste management is vital for protecting our environment. Each step is important, and by making small changes in our daily lives, we can contribute to a healthier planet. Let’s work together to make waste management more sustainable for ourselves and future generations.</pre>
+    </section>
+  </main>
+
+  <script>
+    async function copyPrompt() {
+      const prompt = document.getElementById('promptText').innerText;
+      const status = document.getElementById('copyStatus');
+      try {
+        await navigator.clipboard.writeText(prompt);
+        status.style.display = 'inline';
+        setTimeout(() => { status.style.display = 'none'; }, 1800);
+      } catch (err) {
+        const textArea = document.createElement('textarea');
+        textArea.value = prompt;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        status.style.display = 'inline';
+        setTimeout(() => { status.style.display = 'none'; }, 1800);
+      }
+    }
+  </script>
+</body>
+</html>
